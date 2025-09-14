@@ -1,0 +1,78 @@
+#include <Arduino.h>
+#include <SPI.h>
+#include <TFT_eSPI.h>
+#include <XPT2046_Touchscreen.h>
+
+// ----------------- TFT 및 터치 객체 생성 -----------------
+TFT_eSPI tft = TFT_eSPI();
+
+// 터치스크린 핀 정의
+#define XPT2046_IRQ 36
+#define XPT2046_MOSI 32
+#define XPT2046_MISO 39
+#define XPT2046_CLK 25
+#define XPT2046_CS 33
+
+// 터치스크린용 별도 SPI 버스 설정
+SPIClass touchscreenSPI = SPIClass(VSPI);
+XPT2046_Touchscreen touchscreen(XPT2046_CS, XPT2046_IRQ);
+
+// 화면 해상도 및 시간 상수
+#define SCREEN_WIDTH 320
+#define SCREEN_HEIGHT 240
+#define THIRTY_MINUTES (30UL * 60UL * 1000UL)
+#define FIVE_MINUTES (5UL * 60UL * 1000UL)
+
+//스피커 핀 및 소리 크기(볼륨)
+#define DAC_PIN 26 // 스피커 DAC 핀
+#define BEEP_VOLUME 0.2f // 째깍거리는 소리 크기 (0.1 ~ 127.0 사이로 조절)
+#define TICK_FREQ 500      // 소리 높이 (숫자가 낮을수록 '툭', 높을수록 '똑')
+#define TICK_DURATION 10   // 소리 길이 (10~20 사이 추천)
+#define TICK_VOLUME 0.2f   // 소리 크기 (0.1 ~ 127.0)
+
+// 타이머 중앙 터치 무시 영역
+#define DEAD_ZONE_X 60
+#define DEAD_ZONE_Y 100
+#define DEAD_ZONE_W 200
+#define DEAD_ZONE_H 50
+
+// 밝기 조절 설정
+#define TFT_BL_PIN 21
+const int PWM_FREQ = 5000;
+const int PWM_RESOLUTION = 8;
+
+// ----------------- 전역 변수 -----------------
+unsigned long startTime = 0;
+unsigned long totalTime = 0;
+unsigned long pauseStartTime = 0;
+bool isPaused = false;
+int goodCount = 0;
+int badCount = 0;
+int brightnessLevel = 4;
+int selectedQuadrant = 0;
+
+// 프로그램 상태 정의
+enum TimerState { STATE_IDLE, RUNNING, SHOW_SCORE, FEEDBACK, BREAK_RUNNING, STATE_SETTINGS, STATE_CONFIRM_EXIT };
+TimerState currentState = STATE_IDLE;
+TimerState previousState = STATE_IDLE;
+
+
+// ----------------- 모든 함수 선언 -----------------
+void displayIdleScreen();
+void displayTimerScreen();
+void displayScoreScreen();
+void displayFeedbackScreen();
+void displayBreakTimerScreen();
+void displaySettingsScreen();
+void displayConfirmExitScreen();
+void redrawTimerScreen(bool isBreakTimer);
+void drawBrightnessIndicator();
+void drawFeedbackButton(int quadrant, bool isHighlighted);
+void drawFeedbackText(int quadrant, uint16_t textColor);
+void updateTimerDisplay(bool forceUpdate = false);
+void updateBreakTimerDisplay(bool forceUpdate = false);
+void handleTouch();
+void flashButton(int quadrant);
+int getQuadrant(int x, int y);
+void beep(int frequency, int duration, float volume);
+void tick(int frequency, int duration, float volume);
