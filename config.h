@@ -2,9 +2,12 @@
 #include <SPI.h>
 #include <TFT_eSPI.h>
 #include <XPT2046_Touchscreen.h>
+#include <Preferences.h>
 
 // ----------------- TFT 및 터치 객체 생성 -----------------
 TFT_eSPI tft = TFT_eSPI();
+
+Preferences preferences;
 
 // 터치스크린 핀 정의
 #define XPT2046_IRQ 36
@@ -48,14 +51,20 @@ unsigned long pauseStartTime = 0;
 bool isPaused = false;
 int goodCount = 0;
 int badCount = 0;
-int brightnessLevel = 4;
+int brightnessLevel = 2;
 int selectedQuadrant = 0;
+unsigned long lastTouchTime = 0;
 
 // 프로그램 상태 정의
 enum TimerState { STATE_IDLE, RUNNING, SHOW_SCORE, FEEDBACK, BREAK_RUNNING, STATE_SETTINGS, STATE_CONFIRM_EXIT };
 TimerState currentState = STATE_IDLE;
 TimerState previousState = STATE_IDLE;
 
+// 자동 복귀 타임아웃 (3분)
+#define AUTO_HOME_TIMEOUT (3UL * 60UL * 1000UL)
+
+// 절전 모드 타임아웃 (20분)
+#define DEEP_SLEEP_TIMEOUT (1UL * 60UL * 1000UL) 
 
 // ----------------- 모든 함수 선언 -----------------
 void displayIdleScreen();

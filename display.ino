@@ -1,5 +1,6 @@
 // 1. 메인 화면
 void displayIdleScreen() {
+  lastTouchTime = millis();
   currentState = STATE_IDLE;
   selectedQuadrant = 0;
   tft.fillScreen(TFT_BLACK);
@@ -48,6 +49,7 @@ void displayTimerScreen() {
 
 // 3. 점수판 화면
 void displayScoreScreen() {
+  lastTouchTime = millis();
   currentState = SHOW_SCORE;
   tft.fillScreen(TFT_DARKGREEN);
   tft.setTextColor(TFT_WHITE, TFT_DARKGREEN);
@@ -64,6 +66,7 @@ void displayScoreScreen() {
 
 // 4. 피드백 화면
 void displayFeedbackScreen() {
+  lastTouchTime = millis();
   currentState = FEEDBACK;
   selectedQuadrant = 0;
   tft.fillScreen(TFT_MAROON);
@@ -75,7 +78,7 @@ void displayFeedbackScreen() {
   int splitYStart = 60; 
   tft.drawFastVLine(SCREEN_WIDTH / 2, splitYStart, SCREEN_HEIGHT - splitYStart, TFT_WHITE);
   tft.drawFastHLine(0, (SCREEN_HEIGHT + splitYStart) / 2, SCREEN_WIDTH, TFT_WHITE);
-  drawFeedbackButton(1, false);
+  drawFeedbackButton(1, false); 
   drawFeedbackButton(2, false);
   drawFeedbackButton(3, false);
   drawFeedbackButton(4, false);
@@ -124,15 +127,15 @@ void displayConfirmExitScreen() {
   tft.setTextColor(TFT_WHITE, TFT_DARKGREY);
   tft.setTextSize(2);
   tft.setCursor(80, 80);
-  tft.print("나가시겠습니까?");
+  tft.print("Exit?");
 
   tft.fillRect(60, 120, 90, 40, TFT_DARKGREEN);
   tft.setCursor(85, 132);
-  tft.print("아니오");
+  tft.print("No");
 
   tft.fillRect(170, 120, 90, 40, TFT_MAROON);
   tft.setCursor(210, 132);
-  tft.print("예");
+  tft.print("Yes");
 }
 
 // 8. 타이머 화면 복구

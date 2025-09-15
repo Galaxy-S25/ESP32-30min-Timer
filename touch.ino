@@ -1,5 +1,6 @@
 void handleTouch() {
   if (touchscreen.tirqTouched() && touchscreen.touched()) {
+    lastTouchTime = millis();  // <<< 터치가 감지되면 무조건 시간 갱신
     TS_Point p = touchscreen.getPoint();
     int x = map(p.x, 200, 3700, 1, SCREEN_WIDTH);
     int y = map(p.y, 240, 3800, 1, SCREEN_HEIGHT);
@@ -160,26 +161,29 @@ void handleTouch() {
         }
         if (quadrant == selectedQuadrant) {
           if (quadrant == 1 || quadrant == 3) {
-            drawFeedbackButton(quadrant, false);
+            const int BLINK_COUNT = 3;       // 총 몇 번 깜빡일지 설정
+            const int BLINK_DELAY_MS = 200;  // 깜빡임 간격 설정
+
+            drawFeedbackButton(quadrant, false);  // 버튼 하이라이트 제거
             delay(50);
-            drawFeedbackText(quadrant, TFT_MAROON);
-            delay(200);
-            drawFeedbackText(quadrant, TFT_WHITE);
-            delay(200);
-            drawFeedbackText(quadrant, TFT_MAROON);
-            delay(200);
-            drawFeedbackText(quadrant, TFT_WHITE);
-            delay(200);
-            drawFeedbackText(quadrant, TFT_MAROON);
-            delay(200);
-            drawFeedbackText(quadrant, TFT_WHITE);
-            delay(200);
-            drawFeedbackText(quadrant, TFT_MAROON);
-            delay(100);
-            if (quadrant == 1) goodCount++;
-            else badCount++;
-            displayIdleScreen();
-          } else if (quadrant == 4) {
+
+            // 설정한 횟수만큼 깜빡임 효과를 반복
+            for (int i = 0; i < BLINK_COUNT; i++) {
+              drawFeedbackText(quadrant, TFT_WHITE);  // 텍스트 ON (흰색)
+              delay(BLINK_DELAY_MS);
+              drawFeedbackText(quadrant, TFT_MAROON);  // 텍스트 OFF (배경색)
+              delay(BLINK_DELAY_MS);
+            }
+
+            delay(50);  // 선택 확정 후 잠시 대기
+
+            if (quadrant == 1) {
+              goodCount++;
+              preferences.putInt("good", goodCount);
+            } else {
+              badCount++;
+              preferences.putInt("bad", badCount);
+            }
             displayIdleScreen();
           }
         } else {
