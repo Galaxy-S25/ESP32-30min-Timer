@@ -1,5 +1,8 @@
+#include "config.h"
 // 1. 메인 화면
 void displayIdleScreen() {
+  // 메인 화면 진입 시 사용자가 설정한 원래 밝기로 복원
+  ledcWrite(TFT_BL_PIN, map(brightnessLevel, 0, 4, 55, 255));
   lastTouchTime = millis();
   currentState = STATE_IDLE;
   selectedQuadrant = 0;
@@ -102,6 +105,7 @@ void displayBreakTimerScreen() {
 
 // 6. 설정 화면
 void displaySettingsScreen() {
+  lastTouchTime = millis();
   currentState = STATE_SETTINGS;
   tft.fillScreen(TFT_DARKGREY);
   tft.setTextColor(TFT_WHITE, TFT_DARKGREY);
@@ -223,4 +227,47 @@ void drawFeedbackText(int quadrant, uint16_t textColor) {
   int textY = rectY + (rectH - 24) / 2;
   tft.setCursor(textX, textY);
   tft.print(text);
+}
+
+// 12. 시계 화면
+void displayClockScreen() {
+  currentState = STATE_CLOCK;
+  // 시계 모드 진입 시 밝기를 최저(0단계)로 설정
+  ledcWrite(TFT_BL_PIN, map(0, 0, 4, 55, 255)); 
+  tft.fillScreen(TFT_BLACK); // 화면을 검은색으로 채움
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  updateClockDisplay(true); // 시계 표시를 즉시 업데이트
+  
+}
+
+// 13. 시계 표시 업데이트
+void updateClockDisplay(bool forceUpdate) {
+  static int lastMinute = -1;
+  struct tm timeinfo;
+
+  // 로컬 시간 정보를 가져옴
+  if (!getLocalTime(&timeinfo)) {
+    Serial.println("Failed to obtain time");
+    return;
+  }
+
+  // 1분에 한 번만 화면 전체를 다시 그리도록 함 (깜빡임 방지)
+  if (lastMinute != timeinfo.tm_min || forceUpdate) {
+    lastMinute = timeinfo.tm_min;
+
+    char timeHourMinute[6]; // "HH:MM" + null
+    sprintf(timeHourMinute, "%02d:%02d", timeinfo.tm_hour, timeinfo.tm_min);
+    
+    tft.setTextSize(7); // 시:분 텍스트 크기
+    int textWidth = tft.textWidth(timeHourMinute);
+    tft.setCursor((SCREEN_WIDTH - textWidth) / 2, 80);
+    tft.print(timeHourMinute);
+  }
+
+  // 초(second)는 작게 표시
+  char timeSecond[3];
+  sprintf(timeSecond, "%02d", timeinfo.tm_sec);
+  tft.setTextSize(3);
+  tft.setCursor(260, 140);
+  tft.print(timeSecond);
 }

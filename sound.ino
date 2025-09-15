@@ -1,3 +1,4 @@
+#include "config.h"
 /**
  * @brief DAC를 이용해 '똑' 소리를 재생하는 최종 함수 (사인파 방식)
  * @param frequency 재생할 소리의 주파수 (Hz)

@@ -1,3 +1,4 @@
+#include "config.h"
 void updateTimerDisplay(bool forceUpdate) {
   static unsigned long lastUpdateTime = 0;
   if (!forceUpdate && (millis() - lastUpdateTime < 1000)) return;

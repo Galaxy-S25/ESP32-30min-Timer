@@ -1,3 +1,4 @@
+#include "config.h"
 void handleTouch() {
   if (touchscreen.tirqTouched() && touchscreen.touched()) {
     lastTouchTime = millis();  // <<< 터치가 감지되면 무조건 시간 갱신
@@ -7,6 +8,9 @@ void handleTouch() {
     int quadrant;
 
     switch (currentState) {
+      case STATE_CLOCK:
+        displayIdleScreen(); // 시계 화면에서 터치하면 메인 화면으로
+        break;
       case STATE_IDLE:
         quadrant = getQuadrant(x, y);
         if (quadrant == 1) {

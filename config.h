@@ -1,9 +1,20 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
 #include <Arduino.h>
+#include <FS.h>
 #include <SPI.h>
 #include <TFT_eSPI.h>
 #include <XPT2046_Touchscreen.h>
 #include <Preferences.h>
+#include "time.h"
 
+// 와이파이 및 웹서버 관련 라이브러리 (의존성 순서대로 정렬)
+
+#include <WiFi.h>
+#include <DNSServer.h>
+#include <WebServer.h>
+#include <WiFiManager.h>
 // ----------------- TFT 및 터치 객체 생성 -----------------
 TFT_eSPI tft = TFT_eSPI();
 
@@ -51,20 +62,22 @@ unsigned long pauseStartTime = 0;
 bool isPaused = false;
 int goodCount = 0;
 int badCount = 0;
-int brightnessLevel = 2;
+int brightnessLevel = 1;
 int selectedQuadrant = 0;
 unsigned long lastTouchTime = 0;
+const char* ntpServer = "pool.ntp.org";
+const long  gmtOffset_sec = 9*3600;
+const int   daylightOffset_sec = 0;
 
 // 프로그램 상태 정의
-enum TimerState { STATE_IDLE, RUNNING, SHOW_SCORE, FEEDBACK, BREAK_RUNNING, STATE_SETTINGS, STATE_CONFIRM_EXIT };
+enum TimerState { STATE_IDLE, RUNNING, SHOW_SCORE, FEEDBACK, BREAK_RUNNING, STATE_SETTINGS, STATE_CONFIRM_EXIT, STATE_CLOCK };
 TimerState currentState = STATE_IDLE;
 TimerState previousState = STATE_IDLE;
 
-// 자동 복귀 타임아웃 (3분)
-#define AUTO_HOME_TIMEOUT (3UL * 60UL * 1000UL)
+// 자동 복귀 타임아웃 (1분)
+#define AUTO_HOME_TIMEOUT (1UL * 60UL * 1000UL)
 
-// 절전 모드 타임아웃 (20분)
-#define DEEP_SLEEP_TIMEOUT (1UL * 60UL * 1000UL) 
+#define CLOCK_MODE_TIMEOUT (1UL * 60UL * 1000UL)
 
 // ----------------- 모든 함수 선언 -----------------
 void displayIdleScreen();
@@ -85,3 +98,6 @@ void flashButton(int quadrant);
 int getQuadrant(int x, int y);
 void beep(int frequency, int duration, float volume);
 void tick(int frequency, int duration, float volume);
+void updateClockDisplay(bool forceUpdate = false);
+void displayClockScreen();
+#endif
