@@ -15,6 +15,7 @@
 #include <DNSServer.h>
 #include <WebServer.h>
 #include <WiFiManager.h>
+
 // ----------------- TFT 및 터치 객체 생성 -----------------
 TFT_eSPI tft = TFT_eSPI();
 
@@ -37,18 +38,13 @@ XPT2046_Touchscreen touchscreen(XPT2046_CS, XPT2046_IRQ);
 #define THIRTY_MINUTES (30UL * 60UL * 1000UL)
 #define FIVE_MINUTES (5UL * 60UL * 1000UL)
 
-//스피커 핀 및 소리 크기(볼륨)
-#define DAC_PIN 26 // 스피커 DAC 핀
-#define BEEP_VOLUME 0.2f // 째깍거리는 소리 크기 (0.1 ~ 127.0 사이로 조절)
-#define TICK_FREQ 500      // 소리 높이 (숫자가 낮을수록 '툭', 높을수록 '똑')
-#define TICK_DURATION 10   // 소리 길이 (10~20 사이 추천)
-#define TICK_VOLUME 0.2f   // 소리 크기 (0.1 ~ 127.0)
 
 // 타이머 중앙 터치 무시 영역
 #define DEAD_ZONE_X 60
 #define DEAD_ZONE_Y 100
 #define DEAD_ZONE_W 200
 #define DEAD_ZONE_H 50
+
 
 // 밝기 조절 설정
 #define TFT_BL_PIN 21
@@ -68,6 +64,7 @@ unsigned long lastTouchTime = 0;
 const char* ntpServer = "pool.ntp.org";
 const long  gmtOffset_sec = 9*3600;
 const int   daylightOffset_sec = 0;
+
 
 // 프로그램 상태 정의
 enum TimerState { STATE_IDLE, RUNNING, SHOW_SCORE, FEEDBACK, BREAK_RUNNING, STATE_SETTINGS, STATE_CONFIRM_EXIT, STATE_CLOCK };
@@ -96,8 +93,6 @@ void updateBreakTimerDisplay(bool forceUpdate = false);
 void handleTouch();
 void flashButton(int quadrant);
 int getQuadrant(int x, int y);
-void beep(int frequency, int duration, float volume);
-void tick(int frequency, int duration, float volume);
 void updateClockDisplay(bool forceUpdate = false);
 void displayClockScreen();
 #endif

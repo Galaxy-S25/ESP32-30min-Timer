@@ -31,8 +31,22 @@ void setup() {
   Serial.println("\nWiFi CONNECTED!");
   Serial.print("IP Address: ");
   Serial.println(WiFi.localIP());
+
   // 인터넷 시간 설정
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+
+  Serial.print("Syncing time");
+  struct tm timeinfo;
+  int retry = 0;
+  while (!getLocalTime(&timeinfo) && retry < 20) {
+    Serial.print(".");
+    delay(500);
+    retry++;
+  }
+
+
+  Serial.println("Time synced. Disconnecting WiFi...");
+  WiFi.disconnect(true);  // 와이파이 연결을 끊고 모듈 전원도 끔
 
   // 백라이트 PWM 설정
   ledcAttach(TFT_BL_PIN, PWM_FREQ, PWM_RESOLUTION);
@@ -48,13 +62,12 @@ void setup() {
 }
 
 void loop() {
-  handleTouch(); // 터치 입력은 항상 확인
+  handleTouch();  // 터치 입력은 항상 확인
 
   // 1. 타이머가 실행 중일 때의 로직
   if (currentState == RUNNING && !isPaused) {
     updateTimerDisplay();
-  } 
-  else if (currentState == BREAK_RUNNING && !isPaused) {
+  } else if (currentState == BREAK_RUNNING && !isPaused) {
     updateBreakTimerDisplay();
   }
 
@@ -73,6 +86,6 @@ void loop() {
       displayClockScreen();
     }
   }
-  
+
   delay(50);
 }

@@ -3,7 +3,6 @@ void updateTimerDisplay(bool forceUpdate) {
   static unsigned long lastUpdateTime = 0;
   if (!forceUpdate && (millis() - lastUpdateTime < 1000)) return;
   lastUpdateTime = millis();
-  tick(TICK_FREQ, TICK_DURATION, TICK_VOLUME);
   unsigned long elapsed = millis() - startTime;
   if (elapsed >= totalTime) {
       displayFeedbackScreen();
@@ -12,7 +11,7 @@ void updateTimerDisplay(bool forceUpdate) {
   unsigned long remaining = totalTime - elapsed;
   int minutes = remaining / 60000;
   int seconds = (remaining % 60000) / 1000;
-  tft.fillRect(60, 100, 200, 50, TFT_NAVY);
+  // tft.fillRect(60, 100, 200, 50, TFT_NAVY);
   tft.setTextSize(5);
   if (isPaused) {
     tft.setTextColor(TFT_RED, TFT_NAVY);
@@ -27,7 +26,6 @@ void updateBreakTimerDisplay(bool forceUpdate) {
   static unsigned long lastUpdateTime = 0;
   if (!forceUpdate && (millis() - lastUpdateTime < 1000)) return;
   lastUpdateTime = millis();
-  tick(TICK_FREQ, TICK_DURATION, TICK_VOLUME);
   unsigned long elapsed = millis() - startTime;
   if (elapsed >= totalTime) {
       displayIdleScreen();
@@ -36,7 +34,7 @@ void updateBreakTimerDisplay(bool forceUpdate) {
   unsigned long remaining = totalTime - elapsed;
   int minutes = remaining / 60000;
   int seconds = (remaining % 60000) / 1000;
-  tft.fillRect(60, 100, 200, 50, TFT_BLUE);
+  // tft.fillRect(60, 100, 200, 50, TFT_BLUE);
   tft.setTextSize(5);
   if (isPaused) {
     tft.setTextColor(TFT_RED, TFT_BLUE);
